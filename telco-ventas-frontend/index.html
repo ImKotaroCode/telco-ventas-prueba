@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Telco Ventas - Demo</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">TV</div>
+    <div>
+      <div class="title">Telco Ventas</div>
+      <div class="subtitle">Fija Hogar · Demo prueba técnica</div>
+    </div>
+  </div>
+
+  <div class="userbox">
+    <span id="userInfo" class="muted">No autenticado</span>
+    <button id="btnLogout" class="btn btn-ghost" hidden>Cerrar sesión</button>
+  </div>
+</header>
+
+<main class="container">
+  <!-- LOGIN -->
+  <section id="pageLogin" class="card">
+    <h2>Iniciar sesión</h2>
+    <p class="muted">Usa los usuarios seed: admin / agente1 / back1 / supervisor1</p>
+
+    <form id="loginForm" class="grid">
+      <label>
+        Usuario
+        <input name="username" placeholder="agente1" required />
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" placeholder="Agente*123" required />
+      </label>
+      <button class="btn btn-primary" type="submit">Entrar</button>
+    </form>
+
+    <div id="loginMsg" class="msg" hidden></div>
+  </section>
+
+  <!-- NAV + PÁGINAS (post login) -->
+  <section id="pageApp" hidden>
+    <nav class="tabs">
+      <button class="tab" data-tab="agente" id="tabAgente">Agente</button>
+      <button class="tab" data-tab="backoffice" id="tabBackoffice">Backoffice</button>
+      <button class="tab" data-tab="supervisor" id="tabSupervisor">Supervisor</button>
+      <button class="tab" data-tab="reportes" id="tabReportes">Reportes</button>
+    </nav>
+
+    <!-- AGENTE -->
+    <section id="panelAgente" class="card" hidden>
+      <h2>Agente</h2>
+      <div class="split">
+        <div class="card inner">
+          <h3>Registrar venta</h3>
+          <form id="formCrearVenta" class="grid">
+            <label>DNI/RUC
+              <input name="dniCliente" placeholder="12345678 o 10456789012" required />
+            </label>
+            <label>Nombre cliente
+              <input name="nombreCliente" placeholder="Juan Perez" required />
+            </label>
+            <label>Teléfono
+              <input name="telefonoCliente" placeholder="999888777" required />
+            </label>
+            <label>Dirección
+              <input name="direccionCliente" placeholder="Av. Lima 123" required />
+            </label>
+            <label>Plan actual
+              <input name="planActual" placeholder="Plan A" required />
+            </label>
+            <label>Plan nuevo
+              <input name="planNuevo" placeholder="Plan B" required />
+            </label>
+            <label>Código llamada (único)
+              <input name="codigoLlamada" placeholder="CALL-0009" required />
+            </label>
+            <label>Producto
+              <select name="producto" required>
+                <option value="FIJA_HOGAR">FIJA_HOGAR</option>
+              </select>
+            </label>
+            <label>Monto
+              <input name="monto" type="number" step="0.01" placeholder="120.50" required />
+            </label>
+
+            <button class="btn btn-primary" type="submit">Crear</button>
+          </form>
+          <div id="msgCrearVenta" class="msg" hidden></div>
+        </div>
+
+        <div class="card inner">
+          <h3>Mis ventas</h3>
+
+          <div class="filters">
+            <label>Estado
+              <select id="fEstadoMis">
+                <option value="">(Todos)</option>
+                <option value="PENDIENTE">PENDIENTE</option>
+                <option value="APROBADA">APROBADA</option>
+                <option value="RECHAZADA">RECHAZADA</option>
+              </select>
+            </label>
+            <label>Desde
+              <input id="fDesdeMis" type="datetime-local" />
+            </label>
+            <label>Hasta
+              <input id="fHastaMis" type="datetime-local" />
+            </label>
+            <button id="btnBuscarMis" class="btn">Buscar</button>
+          </div>
+
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>Código</th><th>Cliente</th><th>Monto</th><th>Estado</th><th>Registro</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyMis"></tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <button id="btnPrevMis" class="btn btn-ghost">◀</button>
+            <span id="lblPageMis" class="muted">0</span>
+            <button id="btnNextMis" class="btn btn-ghost">▶</button>
+          </div>
+
+          <div id="msgMis" class="msg" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BACKOFFICE -->
+    <section id="panelBackoffice" class="card" hidden>
+      <h2>Backoffice</h2>
+
+      <div class="row">
+        <button id="btnRefrescarPendientes" class="btn">Refrescar pendientes</button>
+      </div>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Agente</th><th>Código</th><th>Cliente</th><th>Monto</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPendientes"></tbody>
+        </table>
+      </div>
+
+      <div id="msgBackoffice" class="msg" hidden></div>
+    </section>
+
+    <!-- SUPERVISOR -->
+    <section id="panelSupervisor" class="card" hidden>
+      <h2>Supervisor</h2>
+
+      <div class="filters">
+        <label>Estado
+          <select id="fEstadoEq">
+            <option value="">(Todos)</option>
+            <option value="PENDIENTE">PENDIENTE</option>
+            <option value="APROBADA">APROBADA</option>
+            <option value="RECHAZADA">RECHAZADA</option>
+          </select>
+        </label>
+        <label>Agente ID
+          <input id="fAgenteIdEq" type="number" placeholder="3" />
+        </label>
+        <label>Desde
+          <input id="fDesdeEq" type="datetime-local" />
+        </label>
+        <label>Hasta
+          <input id="fHastaEq" type="datetime-local" />
+        </label>
+        <button id="btnBuscarEq" class="btn">Buscar</button>
+      </div>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Agente</th><th>Código</th><th>Cliente</th><th>Monto</th><th>Estado</th><th>Registro</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyEquipo"></tbody>
+        </table>
+      </div>
+
+      <div id="msgSupervisor" class="msg" hidden></div>
+    </section>
+
+    <!-- REPORTES -->
+    <section id="panelReportes" class="card" hidden>
+      <h2>Reportes</h2>
+
+      <div class="filters">
+        <label>Desde
+          <input id="rDesde" type="datetime-local" />
+        </label>
+        <label>Hasta
+          <input id="rHasta" type="datetime-local" />
+        </label>
+        <button id="btnResumen" class="btn btn-primary">Consultar resumen</button>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="kpiTitle">Pendientes</div><div id="kPend" class="kpiVal">-</div></div>
+        <div class="kpi"><div class="kpiTitle">Aprobadas</div><div id="kAprob" class="kpiVal">-</div></div>
+        <div class="kpi"><div class="kpiTitle">Rechazadas</div><div id="kRech" class="kpiVal">-</div></div>
+        <div class="kpi"><div class="kpiTitle">Monto aprobadas</div><div id="kMonto" class="kpiVal">-</div></div>
+      </div>
+
+      <div class="card inner">
+        <h3>Serie ventas por día</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr><th>Día</th><th>Cantidad</th><th>Monto</th></tr>
+            </thead>
+            <tbody id="tbodySerie"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="msgReportes" class="msg" hidden></div>
+    </section>
+
+  </section>
+</main>
+
+<footer class="footer muted">
+  Front mínimo sin frameworks · Solo para demostrar flujo de la prueba técnica
+</footer>
+
+<script type="module" src="./js/ui.js"></script>
+</body>
+</html>
