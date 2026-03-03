@@ -145,7 +145,9 @@ Para endpoints protegidos:
 2. Copiar el token
 3. Click en **Authorize**
 4. Pegar el token como Bearer
-   
+
+También disponible el JSON OpenAPI en:
+http://localhost:8080/v3/api-docs
 ## ✅ Estado
 
 ✔ Flujo completo funcional  
