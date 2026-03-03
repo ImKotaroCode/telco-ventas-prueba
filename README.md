@@ -146,7 +146,13 @@ Para endpoints protegidos:
 3. Click en **Authorize**
 4. Pegar el token como Bearer
 
-También disponible el JSON OpenAPI en:
+## 📘 OpenAPI
+
+La especificación OpenAPI se encuentra en:
+
+- docs/openapi.json
+
+También puede visualizarse en Swagger UI:
 http://localhost:8080/v3/api-docs
 ## ✅ Estado
 
