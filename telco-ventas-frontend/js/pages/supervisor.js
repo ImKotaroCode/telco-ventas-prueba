@@ -1,4 +1,5 @@
 import { api } from "../api.js";
+import { getRole } from "../auth.js";
 
 function isoFromDatetimeLocal(value) {
   if (!value) return "";
@@ -15,7 +16,11 @@ export function initSupervisor() {
   const fHasta = document.getElementById("fHastaEq");
   const btn = document.getElementById("btnBuscarEq");
 
+  const isSupervisor = () => getRole() === "SUPERVISOR";
+
   async function cargarEquipo() {
+    if (!isSupervisor()) return; 
+
     msg.hidden = true;
     tbody.innerHTML = "";
 
@@ -35,6 +40,7 @@ export function initSupervisor() {
 
     try {
       const res = await api.equipo(`?${params.toString()}`);
+
       for (const v of (res.content || [])) {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -61,6 +67,11 @@ export function initSupervisor() {
     }
   }
 
-  btn.addEventListener("click", () => cargarEquipo());
-  setTimeout(() => cargarEquipo().catch(()=>{}), 600);
+  btn.addEventListener("click", () => {
+    if (!isSupervisor()) return;
+    cargarEquipo();
+  });
+
+  // auto-carga solo si el rol corresponde
+  setTimeout(() => { if (isSupervisor()) cargarEquipo().catch(()=>{}); }, 600);
 }

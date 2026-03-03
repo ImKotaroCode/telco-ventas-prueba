@@ -1,11 +1,11 @@
 import { api } from "../api.js";
+import { getRole } from "../auth.js";
 
 let page = 0;
 const size = 10;
 
 function isoFromDatetimeLocal(value) {
   if (!value) return "";
-  // datetime-local: "2026-03-03T10:00" => "2026-03-03T10:00:00"
   return value.length === 16 ? `${value}:00` : value;
 }
 
@@ -14,6 +14,9 @@ function esc(s) {
 }
 
 export function initAgente() {
+
+  const isAgente = () => getRole() === "AGENTE";
+
   // ===== Registrar venta =====
   const form = document.getElementById("formCrearVenta");
   const msgCrear = document.getElementById("msgCrearVenta");
@@ -22,7 +25,7 @@ export function initAgente() {
   const inputDni = form.querySelector('input[name="dniCliente"]');
   const inputTel = form.querySelector('input[name="telefonoCliente"]');
 
-  // mensajes debajo de inputs (sin tocar HTML)
+  // mensajes debajo de inputs
   const dniMsg = document.createElement("div");
   dniMsg.className = "validation-msg";
   inputDni.parentElement.appendChild(dniMsg);
@@ -84,11 +87,9 @@ export function initAgente() {
   }
 
   function validateRequired() {
-    // solo campos del form de crear
     const fd = new FormData(form);
     const payload = Object.fromEntries(fd.entries());
 
-    // trim básicos
     const required = [
       payload.dniCliente,
       payload.nombreCliente,
@@ -132,6 +133,8 @@ export function initAgente() {
   const fHastaMis = document.getElementById("fHastaMis");
 
   async function cargarMisVentas() {
+    if (!isAgente()) return; 
+
     msgMis.hidden = true;
     tbodyMis.innerHTML = "";
     lblPage.textContent = String(page);
@@ -180,18 +183,21 @@ export function initAgente() {
     }
   }
 
-  // cargar inicial mis ventas
-  setTimeout(() => cargarMisVentas().catch(()=>{}), 200);
+  // cargar inicial solo si el usuario es agente
+  setTimeout(() => { if (isAgente()) cargarMisVentas().catch(()=>{}); }, 200);
 
   btnBuscarMis.addEventListener("click", async () => {
+    if (!isAgente()) return;
     page = 0;
     await cargarMisVentas();
   });
   btnPrevMis.addEventListener("click", async () => {
+    if (!isAgente()) return;
     page = Math.max(0, page - 1);
     await cargarMisVentas();
   });
   btnNextMis.addEventListener("click", async () => {
+    if (!isAgente()) return;
     page += 1;
     await cargarMisVentas();
   });
@@ -201,7 +207,13 @@ export function initAgente() {
     e.preventDefault();
     msgCrear.hidden = true;
 
-    // validación final por si acaso
+    if (!isAgente()) {
+      msgCrear.className = "msg err";
+      msgCrear.textContent = "No autorizado: solo AGENTE puede crear ventas";
+      msgCrear.hidden = false;
+      return;
+    }
+
     validateAllForm();
     if (btnCrear.disabled) {
       msgCrear.className = "msg err";
@@ -213,7 +225,6 @@ export function initAgente() {
     const fd = new FormData(form);
     const payload = Object.fromEntries(fd.entries());
 
-    // normaliza dígitos
     payload.dniCliente = String(payload.dniCliente || "").replace(/\D/g, "").trim();
     payload.telefonoCliente = String(payload.telefonoCliente || "").replace(/\D/g, "").trim();
     payload.monto = Number(payload.monto);
@@ -241,6 +252,5 @@ export function initAgente() {
     }
   });
 
-  // estado inicial del botón
   btnCrear.disabled = true;
 }

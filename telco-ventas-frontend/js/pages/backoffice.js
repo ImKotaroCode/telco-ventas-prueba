@@ -1,16 +1,22 @@
 import { api } from "../api.js";
+import { getRole } from "../auth.js";
 
 export function initBackoffice() {
   const tbody = document.getElementById("tbodyPendientes");
   const msg = document.getElementById("msgBackoffice");
   const btnRef = document.getElementById("btnRefrescarPendientes");
 
+  const isBackoffice = () => getRole() === "BACKOFFICE";
+
   async function cargarPendientes() {
+    if (!isBackoffice()) return; 
+
     msg.hidden = true;
     tbody.innerHTML = "";
     try {
       const params = new URLSearchParams({ page:"0", size:"20", sort:"fechaRegistro", dir:"ASC" });
       const res = await api.pendientes(`?${params.toString()}`);
+
       for (const v of (res.content || [])) {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -26,6 +32,7 @@ export function initBackoffice() {
         `;
         tbody.appendChild(tr);
       }
+
       if (!res.content?.length) {
         msg.className = "msg";
         msg.textContent = "No hay pendientes";
@@ -41,6 +48,14 @@ export function initBackoffice() {
   tbody.addEventListener("click", async (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
+
+    if (!isBackoffice()) {
+      msg.className = "msg err";
+      msg.textContent = "No autorizado: solo BACKOFFICE puede aprobar/rechazar";
+      msg.hidden = false;
+      return;
+    }
+
     const id = btn.dataset.id;
     const act = btn.dataset.act;
 
@@ -60,7 +75,11 @@ export function initBackoffice() {
     }
   });
 
-  btnRef.addEventListener("click", () => cargarPendientes());
+  btnRef.addEventListener("click", () => {
+    if (!isBackoffice()) return;
+    cargarPendientes();
+  });
 
-  setTimeout(() => cargarPendientes().catch(()=>{}), 500);
+  // auto-carga solo si el rol corresponde
+  setTimeout(() => { if (isBackoffice()) cargarPendientes().catch(()=>{}); }, 500);
 }
