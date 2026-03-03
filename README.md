@@ -103,9 +103,13 @@ psql -d telco -f data.sql
 Configurar application.properties:
 
 spring.datasource.url=jdbc:postgresql://localhost:5432/telco
+
 spring.datasource.username=postgres
+
 spring.datasource.password=123456
+
 spring.jpa.hibernate.ddl-auto=none
+
 spring.sql.init.mode=always
 
 Ejecutar:
@@ -127,7 +131,21 @@ Ejemplo:
 http://127.0.0.1:3000
 
 ---
+## 📘 Documentación API (Swagger)
 
+Una vez levantado el backend, acceder a:
+
+http://localhost:8080/swagger-ui
+
+Desde Swagger se pueden probar todos los endpoints.
+
+Para endpoints protegidos:
+
+1. Ejecutar `POST /api/v1/auth/login`
+2. Copiar el token
+3. Click en **Authorize**
+4. Pegar el token como Bearer
+   
 ## ✅ Estado
 
 ✔ Flujo completo funcional  
