@@ -32,7 +32,6 @@ function showTab(name) {
 }
 
 function applyRoleVisibility(role) {
-  // Ocultar todo por defecto
   Object.values(tabs).forEach(t => t.hidden = true);
 
   switch(role) {
@@ -53,7 +52,7 @@ function applyRoleVisibility(role) {
       break;
 
     case "ADMIN":
-      // opcional: admin ve todo
+      //  admin ve todo, pero no puede acceder a nada (sin autorizacion)
       Object.values(tabs).forEach(t => t.hidden = false);
       showTab("agente");
       break;
@@ -81,9 +80,10 @@ export function refreshUI() {
   applyRoleVisibility(role);
 }
 
+// Logout limpio y profesional
 btnLogout.addEventListener("click", () => {
   clearSession();
-  refreshUI();
+  window.location.reload(); // <-- IMPORTANTE
 });
 
 tabs.agente?.addEventListener("click", () => showTab("agente"));

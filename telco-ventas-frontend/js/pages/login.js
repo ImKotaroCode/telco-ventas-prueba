@@ -22,12 +22,8 @@ export function initLogin(onLogged) {
 
       if (!token || !rol) throw new Error("Respuesta de login sin token/rol. Ajusta el mapping en login.js");
 
-      setSession({ token, username: user, rol });
-      msg.className = "msg ok";
-      msg.textContent = "Login OK";
-      msg.hidden = false;
-
-      onLogged?.();
+    setSession({ token, username: user, rol });
+    window.location.reload();
     } catch (err) {
       msg.className = "msg err";
       msg.textContent = `${err.status || ""} ${err.message}`;
