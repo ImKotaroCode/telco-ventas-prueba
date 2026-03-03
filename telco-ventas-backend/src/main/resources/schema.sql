@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS ventas;
+DROP TABLE IF EXISTS usuarios;
+
 CREATE TABLE usuarios (
                           id BIGSERIAL PRIMARY KEY,
                           username VARCHAR(60) NOT NULL UNIQUE,
